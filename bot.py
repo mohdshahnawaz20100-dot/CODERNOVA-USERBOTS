@@ -29,6 +29,23 @@ from telethon.tl.functions.messages import EditChatTitleRequest
 from telethon.tl.functions.messages import SendReactionRequest
 from telethon.tl.types import ReactionEmoji
 from telethon.sessions import StringSession
+# ═══════════════ CUSTOM NAME REPLACER ═══════════════
+_original_send_message = None
+
+def patch_telegram_client():
+    global _original_send_message
+    import inspect
+    from telethon import TelegramClient
+    if _original_send_message is None:
+        _original_send_message = TelegramClient.send_message
+        async def new_send_message(self, *args, **kwargs):
+            if 'message' in kwargs and isinstance(kwargs['message'], str):
+                kwargs['message'] = kwargs['message'].replace("@iVILLAINi", "@Shahnawazzz_7").replace("iVILLAINi", "Shahnawazzz_7")
+            elif len(args) >= 2 and isinstance(args[1], str):
+                args = list(args)
+                args[1] = args[1].replace("@iVILLAINi", "@Shahnawazzz_7").replace("iVILLAINi", "Shahnawazzz_7")
+            return await _original_send_message(self, *args, **kwargs)
+        TelegramClient.send_message = new_send_message
 # ═══════════════ CONFIG ═══════════════
 OWNER_USERNAME = os.getenv("OWNER_USERNAME", "@Shahnawazzz_7")  # 👈 apna username daalein
 try:
@@ -1616,7 +1633,7 @@ def reg_commands(client, owner_id):
 ▸ .schedules — Pending list
 ▸ .cancelschedule <id> — Cancel
 
-✨ ᴘᴏᴡᴇʀᴇᴅ ʙʏ @iVILLAINi ✨"""
+✨ ᴘᴏᴡᴇʀᴇᴅ ʙʏ @Shahnawazzz_7✨"""
 
         try:
             await event.reply(part1)
@@ -1643,7 +1660,7 @@ def reg_commands(client, owner_id):
         h, r = divmod(uptime.seconds, 3600)
         m, s = divmod(r, 60)
         me = await client.get_me()
-        caption = (f"❛.𝁘ໍ𝗖lØn𝛜X🎭.𝁘ໍ USERBOT IS ALIVE\n✨\n⏳ **UPTIME:** {days}d : {h}h : {m}m : {s}s\n👤 **USER:** {me.first_name or 'User'}\n👑 **OWNER:** @iVILLAINi\n")
+        caption = (f" 𝕮𝕷𝕺𝕹𝕴𝖃 USERBOT IS ALIVE\n✨\n⏳ **UPTIME:** {days}d : {h}h : {m}m : {s}s\n👤 **USER:** {me.first_name or 'User'}\n👑 **OWNER:** @iVILLAINi\n")
         IMG = "https://files.catbox.moe/rmj6hg.mp4"
         try: await client.send_file(event.chat_id, IMG, caption=caption, parse_mode='markdown', reply_to=event.message.id)
         except: await event.reply(caption, parse_mode='markdown')
