@@ -4114,7 +4114,7 @@ async def ss_cmd(event):
         await msg.edit("✅ Screenshot ban gaya aur **Saved Messages** mein bhej diya gaya!")
     except Exception as e:
         await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
-            @cmd('vanish', delete_cmd=False)
+        @cmd('vanish', delete_cmd=False)
 async def vanish_cmd(event):
     if event.is_reply:
         reply_msg = await event.get_reply_message()
