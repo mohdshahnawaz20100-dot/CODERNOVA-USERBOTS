@@ -4118,22 +4118,22 @@ async def ss_cmd(event):
         await msg.edit("✅ Screenshot ban gaya aur **Saved Messages** mein bhej diya gaya!")
     except Exception as e:
         await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
-    @cmd('vanish', delete_cmd=False)
-    async def vanish_cmd(event):
-        if event.is_reply:
-
-    reply_msg = await event.get_reply_message()
+@cmd('vanish', delete_cmd=False)
+async def vanish_cmd(event):
+    if event.is_reply:
+        reply_msg = await event.get_reply_message()
         try:
-            await client.delete_messages(event.chat_id, [event.message.id, reply_msg.id])
+            await client.delete_messages("me", [reply_msg.id])
         except Exception:
-            try: await event.delete()
-            except: pass
+            try:
+                await event.delete()
+            except:
+                pass
     else:
         try:
             await event.delete()
         except:
-            await event.reply("❌ Message delete nahi ho paya. (Shayad aap admin nahi hain)")
-
+            await event.reply("❌ Message delete nahi hua.")
 # ═══════════════ STALK ═══════════════
     
     uid = await resolve_user(client, event.message, get_args(event.message))
