@@ -4119,7 +4119,7 @@ async def ss_cmd(event):
     except Exception as e:
         await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
         @cmd('vanish', delete_cmd=False)
-async def vanish_cmd(event):
+        async def vanish_cmd(event):
     if event.is_reply:
         reply_msg = await event.get_reply_message()
         try:
