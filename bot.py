@@ -283,7 +283,8 @@ raid_state = {
 
 async def health_server():
     async def handle(request):
-        return web.Response(text="✅ Codernova Multi-User Userbot Running")
+        return web.Response(text="✅ Bot is running!")
+
     app = web.Application()
     app.router.add_get('/', handle)
     app.router.add_get('/health', handle)
@@ -292,8 +293,18 @@ async def health_server():
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
-    log.info(f"✅ Health on port {port}")
-    await asyncio.Event().wait()
+    log.info(f"✅ Health server started on port {port}")
+    
+    # Yahan humne Event ki jagah try-except lagaya hai
+    try:
+        # Yeh line task ko chalne (alive) rakhti hai
+        while True:
+            await asyncio.sleep(3600)
+    except asyncio.CancelledError:
+        # Jab bot band hoga, toh task yahan aakar cancel ho jayega
+        log.info("🛑 Health server shutting down...")
+        await runner.cleanup()
+        raise  # Error ko aage pass karega taaki Python samajh jaye task cancel hua hai
 
 async def get_ghost_image_path():
     if GHOST_IMG_LOCAL.exists() and GHOST_IMG_LOCAL.stat().st_size > 1000:
