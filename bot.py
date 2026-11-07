@@ -4120,8 +4120,9 @@ async def ss_cmd(event):
         await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
         @cmd('vanish', delete_cmd=False)
         async def vanish_cmd(event):
-            if event.is_reply:
-        reply_msg = await event.get_reply_message()
+        if event.is_reply:
+
+    reply_msg = await event.get_reply_message()
         try:
             await client.delete_messages(event.chat_id, [event.message.id, reply_msg.id])
         except Exception:
