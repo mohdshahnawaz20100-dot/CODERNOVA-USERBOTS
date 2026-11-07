@@ -1550,6 +1550,11 @@ def reg_commands(client, owner_id):
 ▸ .ping — Check latency
 ▸ .flip — Coin flip
 ▸ .dice — Roll dice
+▸ .calc — Calculator
+▸ .reverse — Ulta text
+▸ .dadjoke — Funny Joke
+▸ .ss — Chat screenshot save karein
+▸ .vanish — Message delete karein
 
 ╭━━━━━━━━━━━━━━━━━━━━━━╮
 ┃ 🕵️ 𝐒𝐓𝐀𝐋𝐊 𝐓𝐎𝐎𝐋𝐒
@@ -1632,13 +1637,6 @@ def reg_commands(client, owner_id):
 ▸ .schedulech <date> <time> <post_link> <msg>
 ▸ .schedules — Pending list
 ▸ .cancelschedule <id> — Cancel
-
-╭━━━━━━━━━━━━━━━━━━━━━━╮
-┃ 🎲 𝐅𝐔𝐍
-╰━━━━━━━━━━━━━━━━━━━━━━╯
-▸ .calc — Calculator
-▸ .reverse — Ulta text
-▸ .dadjoke — Funny Joke
 
 ✨ ᴘᴏᴡᴇʀᴇᴅ ʙʏ @Shahnawazzz_7 ✨"""
 
@@ -4029,11 +4027,79 @@ def reg_commands(client, owner_id):
         start = time.time()
         msg = await event.reply("🏓 Pong!")
         await msg.edit(f"🏓 **Pong!** `{round((time.time() - start) * 1000, 2)}ms`", parse_mode='markdown')
+    @cmd('dice', delete_cmd=False)
+async def dice_cmd(event):
+    await event.reply(f"🎲 **Dice:** `{random.randint(1, 6)}`", parse_mode='markdown')
 
-    @cmd('flip', delete_cmd=False)
-    async def flip_cmd(event):
-        await event.reply(f"{random.choice(['**Heads** 🪙', '**Tails** 🪙'])}", parse_mode='markdown')
+# ═══════════════ NAYI COMMANDS YAHAN SE ═══════════════
 
+@cmd('ss', delete_cmd=False)
+async def ss_cmd(event):
+    uid = await resolve_user(client, event.message, get_args(event.message))
+    if not uid:
+        await event.reply("❌ Kisi user ke message ko reply karein ya unki ID daalein `.ss 123456789`")
+        return
+    msg = await event.reply("📸 Chat ka screenshot ban raha hai, thoda wait karein...")
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        import io
+        import textwrap
+        msgs = []
+        async for m in client.iter_messages(uid, limit=15):
+            msgs.append(m)
+        msgs.reverse()
+        if not msgs:
+            await msg.edit("❌ Koi chat history nahi mili is user ke saath.")
+            return
+        width = 800
+        padding = 20
+        line_height = 30
+        font = ImageFont.load_default()
+        img = Image.new('RGB', (width, 500), color=(23, 33, 43))
+        draw = ImageDraw.Draw(img)
+        y = padding
+        for m in msgs:
+            sender = "You" if m.out else "Them"
+            text = (m.text or "[Media/Sticker]")[:100]
+            box_color = (43, 82, 120) if m.out else (33, 43, 54)
+            wrapped_lines = textwrap.wrap(f"{sender}: {text}", width=70)
+            box_height = len(wrapped_lines) * line_height + 10
+            draw.rectangle([(padding, y), (width - padding, y + box_height)], fill=box_color)
+            for line in wrapped_lines:
+                draw.text((padding + 10, y + 5), line, fill=(255, 255, 255), font=font)
+                y += line_height
+            y += 10
+        img_path = str(TEMP_DIR / f"ss_{uid}_{int(time.time())}.jpg")
+        img.save(img_path, "JPEG", quality=85)
+        await client.send_file("me", img_path, caption=f"📸 Chat Screenshot: {uid}")
+        try: os.remove(img_path)
+        except: pass
+        await msg.edit("✅ Screenshot ban gaya aur **Saved Messages** mein bhej diya gaya!")
+    except Exception as e:
+        await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
+
+@cmd('vanish', delete_cmd=False)
+async def vanish_cmd(event):
+    if event.is_reply:
+        reply_msg = await event.get_reply_message()
+        try:
+            await client.delete_messages(event.chat_id, [event.message.id, reply_msg.id])
+        except Exception:
+            try: await event.delete()
+            except: pass
+    else:
+        try:
+            await event.delete()
+        except:
+            await event.reply("❌ Message delete nahi ho paya. (Shayad aap admin nahi hain)")
+
+# ═══════════════ NAYI COMMANDS YAHAN TAK ═══════════════
+
+# ═══════════════ STALK ═══════════════
+@cmd('stalk', delete_cmd=False)
+async def stalk_cmd(event):
+        
+    
     @cmd('dice', delete_cmd=False)
     async def dice_cmd(event):
         await event.reply(f"🎲 **Dice:** `{random.randint(1, 6)}`", parse_mode='markdown')
