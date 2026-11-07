@@ -4033,7 +4033,7 @@ async def dice_cmd(event):
 
 # ═══════════════ NAYI COMMANDS YAHAN SE ═══════════════
 
-@cmd('ss', delete_cmd=False)
+    @cmd('ss', delete_cmd=False)
 async def ss_cmd(event):
     uid = await resolve_user(client, event.message, get_args(event.message))
     if not uid:
