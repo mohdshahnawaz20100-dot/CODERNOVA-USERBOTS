@@ -4016,9 +4016,10 @@ def reg_commands(client, owner_id):
 
     asyncio.create_task(spray_loop())
 
-    @cmd('dspray')
+@cmd('dspray')
 async def dspray_cmd(event):
     db['spam_running'] = False
+    # Aage ka jo bhi code tha us function ka, wo yahan aayega...
     await event.reply("🛑 **Spam stopped!**")
 
 # ═══════════════ FUN & NEW COMMANDS ═══════════════
