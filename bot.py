@@ -4014,10 +4014,10 @@ def reg_commands(client, owner_id):
                     break
             db['spam_running'] = False
 
-        asyncio.create_task(spray_loop())
+    asyncio.create_task(spray_loop())
 
-@cmd('dspray')
-async def dspray_cmd(event):
+    @cmd('dspray')
+    async def dspray_cmd(event):
     db['spam_running'] = False
     await event.reply("🛑 **Spam stopped!**")
 
