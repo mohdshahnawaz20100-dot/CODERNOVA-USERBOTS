@@ -4017,24 +4017,120 @@ def reg_commands(client, owner_id):
         asyncio.create_task(spray_loop())
 
     @cmd('dspray')
-    async def dspray_cmd(event):
-        db['spam_running'] = False
-        await event.reply("🛑 **Spam stopped!**")
+async def dspray_cmd(event):
+    db['spam_running'] = False
+    await event.reply("🛑 **Spam stopped!**")
 
-    # ═══════════════ FUN ═══════════════
-    @cmd('ping', delete_cmd=False)
-    async def ping_cmd(event):
-        start = time.time()
-        msg = await event.reply("🏓 Pong!")
-        await msg.edit(f"🏓 **Pong!** `{round((time.time() - start) * 1000, 2)}ms`", parse_mode='markdown')
-    @cmd('dice', delete_cmd=False)
+# ═══════════════ FUN & NEW COMMANDS ═══════════════
+@cmd('ping', delete_cmd=False)
+async def ping_cmd(event):
+    start = time.time()
+    msg = await event.reply("🏓 Pong!")
+    await msg.edit(f"🏓 **Pong!** `{round((time.time() - start) * 1000, 2)}ms`", parse_mode='markdown')
+
+@cmd('flip', delete_cmd=False)
+async def flip_cmd(event):
+    await event.reply(f"{random.choice(['**Heads** 🪙', '**Tails** 🪙'])}", parse_mode='markdown')
+
+@cmd('dice', delete_cmd=False)
 async def dice_cmd(event):
     await event.reply(f"🎲 **Dice:** `{random.randint(1, 6)}`", parse_mode='markdown')
 
-# ═══════════════ NAYI COMMANDS YAHAN SE ═══════════════
+@cmd('calc', delete_cmd=False)
+async def calc_cmd(event):
+    expr = get_args(event.message)
+    if not expr:
+        await event.reply("❌ **Usage:** `.calc 5+5*2`")
+        return
+    try:
+        result = eval(expr, {"__builtins__": None}, {})
+        await event.reply(f"🧮 **Question:** `{expr}`\n✅ **Answer:** `{result}`", parse_mode='markdown')
+    except Exception:
+        await event.reply("❌ Galat format! Sirf numbers aur +, -, *, / use karein.")
 
-    @cmd('ss', delete_cmd=False)
+@cmd('reverse', delete_cmd=False)
+async def reverse_cmd(event):
+    text = get_args(event.message)
+    if not text:
+        await event.reply("❌ **Usage:** `.reverse Hello World`")
+        return
+    await event.reply(f"🔄 **Reversed:** `{text[::-1]}`", parse_mode='markdown')
+
+@cmd('dadjoke', delete_cmd=False)
+async def dadjoke_cmd(event):
+    msg = await event.reply("😂 Joke dhoondh raha hoon...")
+    try:
+        headers = {'Accept': 'application/json'}
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://icanhazdadjoke.com/', headers=headers) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    await msg.edit(f"😂 **Dad Joke:**\n\n_{data['joke']}_")
+                else:
+                    await msg.edit("❌ Joke nahi mila, try again.")
+    except Exception:
+        await msg.edit("❌ Network error, joke nahi aaya.")
+
+@cmd('ss', delete_cmd=False)
 async def ss_cmd(event):
+    uid = await resolve_user(client, event.message, get_args(event.message))
+    if not uid:
+        await event.reply("❌ Kisi user ke message ko reply karein ya unki ID daalein `.ss 123456789`")
+        return
+    msg = await event.reply("📸 Chat ka screenshot ban raha hai, thoda wait karein...")
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        import textwrap
+        msgs = []
+        async for m in client.iter_messages(uid, limit=15):
+            msgs.append(m)
+        msgs.reverse()
+        if not msgs:
+            await msg.edit("❌ Koi chat history nahi mili is user ke saath.")
+            return
+        width = 800
+        padding = 20
+        line_height = 30
+        font = ImageFont.load_default()
+        img = Image.new('RGB', (width, 500), color=(23, 33, 43))
+        draw = ImageDraw.Draw(img)
+        y = padding
+        for m in msgs:
+            sender = "You" if m.out else "Them"
+            text = (m.text or "[Media/Sticker]")[:100]
+            box_color = (43, 82, 120) if m.out else (33, 43, 54)
+            wrapped_lines = textwrap.wrap(f"{sender}: {text}", width=70)
+            box_height = len(wrapped_lines) * line_height + 10
+            draw.rectangle([(padding, y), (width - padding, y + box_height)], fill=box_color)
+            for line in wrapped_lines:
+                draw.text((padding + 10, y + 5), line, fill=(255, 255, 255), font=font)
+                y += line_height
+            y += 10
+        img_path = str(TEMP_DIR / f"ss_{uid}_{int(time.time())}.jpg")
+        img.save(img_path, "JPEG", quality=85)
+        await client.send_file("me", img_path, caption=f"📸 Chat Screenshot: {uid}")
+        try: os.remove(img_path)
+        except: pass
+        await msg.edit("✅ Screenshot ban gaya aur **Saved Messages** mein bhej diya gaya!")
+    except Exception as e:
+        await msg.edit(f"❌ Screenshot banane mein error aaya: `{str(e)[:100]}`")
+            @cmd('vanish', delete_cmd=False)
+async def vanish_cmd(event):
+    if event.is_reply:
+        reply_msg = await event.get_reply_message()
+        try:
+            await client.delete_messages(event.chat_id, [event.message.id, reply_msg.id])
+        except Exception:
+            try: await event.delete()
+            except: pass
+    else:
+        try:
+            await event.delete()
+        except:
+            await event.reply("❌ Message delete nahi ho paya. (Shayad aap admin nahi hain)")
+
+# ═══════════════ STALK ═══════════════
+    
     uid = await resolve_user(client, event.message, get_args(event.message))
     if not uid:
         await event.reply("❌ Kisi user ke message ko reply karein ya unki ID daalein `.ss 123456789`")
