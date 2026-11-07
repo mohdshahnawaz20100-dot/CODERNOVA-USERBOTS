@@ -1633,7 +1633,15 @@ def reg_commands(client, owner_id):
 ▸ .schedules — Pending list
 ▸ .cancelschedule <id> — Cancel
 
-✨ ᴘᴏᴡᴇʀᴇᴅ ʙʏ @Shahnawazzz_7✨"""
+╭━━━━━━━━━━━━━━━━━━━━━━╮
+┃ 🎲 𝐅𝐔𝐍
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+▸ .calc — Calculator
+▸ .reverse — Ulta text
+▸ .dadjoke — Funny Joke
+
+✨ ᴘᴏᴡᴇʀᴇᴅ ʙʏ @Shahnawazzz_7 ✨"""
+
 
         try:
             await event.reply(part1)
@@ -4029,7 +4037,41 @@ def reg_commands(client, owner_id):
     @cmd('dice', delete_cmd=False)
     async def dice_cmd(event):
         await event.reply(f"🎲 **Dice:** `{random.randint(1, 6)}`", parse_mode='markdown')
+@cmd('calc', delete_cmd=False)
+async def calc_cmd(event):
+    expr = get_args(event.message)
+    if not expr:
+        await event.reply("❌ **Usage:** `.calc 5+5*2`")
+        return
+    try:
+        # Ye safe eval hai, sirf numbers aur math symbols allow karega
+        result = eval(expr, {"__builtins__": None}, {})
+        await event.reply(f"🧮 **Question:** `{expr}`\n✅ **Answer:** `{result}`", parse_mode='markdown')
+    except Exception:
+        await event.reply("❌ Galat format! Sirf numbers aur +, -, *, / use karein.")
 
+@cmd('reverse', delete_cmd=False)
+async def reverse_cmd(event):
+    text = get_args(event.message)
+    if not text:
+        await event.reply("❌ **Usage:** `.reverse Hello World`")
+        return
+    await event.reply(f"🔄 **Reversed:** `{text[::-1]}`", parse_mode='markdown')
+
+@cmd('dadjoke', delete_cmd=False)
+async def dadjoke_cmd(event):
+    msg = await event.reply("😂 Joke dhoondh raha hoon...")
+    try:
+        headers = {'Accept': 'application/json'}
+        async with aiohttp.ClientSession() as session:
+            async with session.get('https://icanhazdadjoke.com/', headers=headers) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    await msg.edit(f"😂 **Dad Joke:**\n\n_{data['joke']}_")
+                else:
+                    await msg.edit("❌ Joke nahi mila, try again.")
+    except Exception:
+        await msg.edit("❌ Network error, joke nahi aaya.")
     # ═══════════════ STALK ═══════════════
     @cmd('stalk', delete_cmd=False)
     async def stalk_cmd(event):
