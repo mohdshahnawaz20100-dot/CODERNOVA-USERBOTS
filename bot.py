@@ -4015,7 +4015,7 @@ def reg_commands(client, owner_id):
             db['spam_running'] = False
 
     asyncio.create_task(spray_loop())
-        db['spam_running'] = False
+    db['spam_running'] = False
 
     asyncio.create_task(spray_loop())
 
